@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.omerdvir.princessturtle'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.omerdvir.princessturtle"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    aaptOptions {
+        // Don't compress audio/images — already compressed; lets seek work
+        noCompress 'mp3', 'jpg', 'png'
+    }
+
+    packagingOptions {
+        // Avoid duplicate file collisions if any
+        resources.excludes += ['META-INF/AL2.0', 'META-INF/LGPL2.1']
+    }
+}
+
+dependencies {
+    // No deps — pure WebView app
+}

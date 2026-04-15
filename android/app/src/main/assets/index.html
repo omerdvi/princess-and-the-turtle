@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#2D4A22">
+  <title>הנסיכה וצב הביצות</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #2D4A22;
+      font-family: 'Rubik', 'Segoe UI', Tahoma, sans-serif;
+      color: #3D2B1F;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      user-select: none; -webkit-user-select: none;
+      overscroll-behavior: none;
+    }
+
+    /* ===== BOOK ===== */
+    #book { width: 100%; height: 100%; position: relative; overflow: hidden; }
+
+    .page {
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      background: #2D4A22;
+    }
+    .page.active {
+      display: flex;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ===== COVER ===== */
+    .cover-page {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .cover-page .image-container {
+      flex: 0 0 70%;
+      width: 100%;
+      cursor: pointer;
+    }
+    .cover-page .image-container img {
+      width: 100%; height: 100%; object-fit: contain;
+    }
+    .cover-bottom {
+      flex: 1;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      gap: 14px; padding: 16px;
+    }
+    .cover-title {
+      font-size: 1.9rem; font-weight: 700; color: #FDF6E3;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      line-height: 1.3; text-align: center;
+    }
+    .cover-author { font-size: 1rem; color: #FDF6E3; opacity: 0.85; }
+    .btn-start {
+      background: #F5A623; color: #fff;
+      border: none; border-radius: 50px;
+      padding: 18px 56px;
+      font-size: 1.5rem; font-family: inherit; font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+      animation: pulseBtn 2.5s ease-in-out infinite;
+    }
+    .btn-start:active { transform: scale(0.95); animation: none; }
+    @keyframes pulseBtn {
+      0%, 100% { transform: scale(1); box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
+      50%      { transform: scale(1.04); box-shadow: 0 6px 20px rgba(245,166,35,0.5); }
+    }
+
+    /* ===== STORY PAGE ===== */
+    .story-page { flex-direction: column; }
+    .story-page .image-container {
+      flex: 0 0 58%;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .story-page .image-container img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center top;
+      pointer-events: none;
+      transform-origin: center center;
+    }
+    .story-page .text-container {
+      flex: 1;
+      background: #FDF6E3;
+      padding: 18px 22px;
+      display: flex; align-items: center; justify-content: center;
+      overflow-y: auto;
+      touch-action: pan-y;
+    }
+    .story-page .text-content {
+      text-align: right;
+      line-height: 2.4;
+      font-size: 1.55rem; font-weight: 600;
+      max-width: 640px; width: 100%;
+      letter-spacing: 0.01em;
+    }
+
+    /* ===== EPILOGUE ===== */
+    .epilogue-page { flex-direction: column; }
+    .epilogue-page .image-container {
+      flex: 0 0 42%;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .epilogue-page .image-container img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center top;
+      pointer-events: none;
+      transform-origin: center center;
+    }
+    .epilogue-content {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 16px;
+      padding: 20px 24px;
+      text-align: center;
+      overflow-y: auto;
+      touch-action: pan-y;
+    }
+    .epilogue-verse {
+      background: #FDF6E3;
+      border-radius: 16px;
+      padding: 18px 22px;
+      font-size: 1.2rem; line-height: 2;
+      color: #3D2B1F; font-weight: 500;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+      max-width: 560px;
+    }
+    .epilogue-moral {
+      font-size: 1.2rem; line-height: 1.8;
+      color: #FDF6E3; font-weight: 600;
+    }
+    .epilogue-moral strong {
+      display: block;
+      font-size: 1.5rem; color: #F5A623;
+      margin-top: 6px;
+    }
+    .btn-restart {
+      background: #F5A623; color: #fff;
+      border: none; border-radius: 50px;
+      padding: 14px 38px;
+      font-size: 1.1rem; font-family: inherit; font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-restart:active { transform: scale(0.95); }
+
+    /* ===== NAV ARROWS ===== */
+    .nav-arrows {
+      position: fixed;
+      bottom: 16px; left: 0; right: 0;
+      display: flex; justify-content: space-between;
+      padding: 0 16px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .nav-btn {
+      width: 80px; height: 80px;
+      border-radius: 50%; border: none;
+      background: rgba(245,166,35,0.85);
+      color: #fff; font-size: 2.4rem;
+      cursor: pointer; pointer-events: auto;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+      transition: transform 0.15s ease, opacity 0.3s ease;
+      font-weight: 700;
+    }
+    .nav-btn:active { transform: scale(0.92); }
+    .nav-btn.hidden { opacity: 0; pointer-events: none; }
+    .nav-btn.pulse { animation: pulseNav 2.5s ease-in-out infinite; }
+    @keyframes pulseNav {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.08); }
+    }
+
+    /* ===== DOTS ===== */
+    .dots-bar {
+      position: fixed;
+      bottom: 110px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 6px;
+      z-index: 99;
+      pointer-events: none;
+    }
+    .dots-bar.hidden { display: none; }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(253,246,227,0.65);
+      transition: background 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .dot.active {
+      background: #F5A623;
+      transform: scale(1.5);
+      box-shadow: 0 0 6px rgba(245,166,35,0.6);
+    }
+
+    /* ===== AUDIO BUTTON ===== */
+    .btn-audio {
+      position: absolute;
+      top: 14px; left: 14px;
+      width: 64px; height: 64px;
+      border-radius: 50%; border: none;
+      background: rgba(245,166,35,0.92);
+      color: #fff; font-size: 1.7rem;
+      cursor: pointer;
+      z-index: 20;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.35);
+      transition: transform 0.15s ease, background 0.2s ease;
+      line-height: 1;
+    }
+    .btn-audio:active { transform: scale(0.88); }
+    .btn-audio.playing { background: rgba(61,43,31,0.9); }
+
+    /* ===== MUTE BUTTON (global) ===== */
+    .btn-mute {
+      position: fixed;
+      top: 14px; right: 14px;
+      width: 48px; height: 48px;
+      border-radius: 50%; border: none;
+      background: rgba(0,0,0,0.4);
+      color: #FDF6E3; font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      transition: transform 0.15s ease;
+    }
+    .btn-mute:active { transform: scale(0.9); }
+
+    /* ===== AUDIO PROGRESS BAR ===== */
+    .audio-progress {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 3px;
+      background: rgba(245,166,35,0.18);
+      pointer-events: none;
+      z-index: 6;
+    }
+    .audio-progress-fill {
+      height: 100%;
+      background: #F5A623;
+      width: 0%;
+      transition: width 0.2s linear;
+    }
+
+    /* ===== SPARKLES ===== */
+    .sparkle {
+      position: fixed;
+      width: 22px; height: 22px;
+      pointer-events: none;
+      z-index: 300;
+      opacity: 0;
+      animation: sparkleRise 1.4s ease-out forwards;
+      font-size: 22px;
+      line-height: 1;
+      filter: drop-shadow(0 0 4px rgba(255,220,120,0.7));
+    }
+    @keyframes sparkleRise {
+      0%   { opacity: 0; transform: translate(0,0) scale(0.5) rotate(0deg); }
+      20%  { opacity: 0.85; }
+      100% { opacity: 0; transform: translate(var(--dx,0), -90px) scale(1.2) rotate(20deg); }
+    }
+
+    /* ===== SILENCE BUBBLE ===== */
+    .silence-bubble {
+      position: absolute;
+      top: 18%; left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border-radius: 18px;
+      padding: 6px 16px;
+      font-size: 1.6rem;
+      color: #888;
+      letter-spacing: 4px;
+      font-weight: 700;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+      pointer-events: none;
+      z-index: 30;
+      opacity: 0;
+      animation: silenceShow 1.8s ease-out forwards;
+    }
+    @keyframes silenceShow {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.85); }
+      30%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+      80%  { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(1); }
+    }
+
+    /* ===== WOBBLE ===== */
+    .wobble { animation: wobble 0.6s ease-in-out; }
+    @keyframes wobble {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25%      { transform: rotate(-5deg) scale(1.02); }
+      75%      { transform: rotate(5deg) scale(1.02); }
+    }
+
+    /* ===== LANDSCAPE ===== */
+    @media (orientation: landscape) {
+      .story-page { flex-direction: row-reverse; }
+      .story-page .image-container { flex: 0 0 55%; height: 100%; }
+      .story-page .text-container { flex: 0 0 45%; padding: 16px 24px; }
+      .story-page .text-content { font-size: 1.3rem; line-height: 2.1; }
+
+      .cover-page { flex-direction: row-reverse; }
+      .cover-page .image-container { flex: 0 0 60%; height: 100%; }
+      .cover-bottom { flex: 0 0 40%; }
+
+      .epilogue-page { flex-direction: row-reverse; }
+      .epilogue-page .image-container { flex: 0 0 50%; height: 100%; }
+      .epilogue-content { flex: 0 0 50%; padding: 18px 22px; gap: 12px; }
+      .epilogue-verse { font-size: 1.05rem; padding: 14px 18px; line-height: 1.9; }
+      .epilogue-moral { font-size: 1.05rem; }
+      .epilogue-moral strong { font-size: 1.3rem; }
+
+      .nav-btn { width: 68px; height: 68px; font-size: 2rem; }
+      .dots-bar { bottom: 96px; }
+    }
+
+    /* ===== SMALL SCREENS ===== */
+    @media (max-height: 600px) and (orientation: portrait) {
+      .story-page .image-container { flex: 0 0 52%; }
+      .story-page .text-content { font-size: 1.25rem; line-height: 2; }
+      .epilogue-page .image-container { flex: 0 0 42%; }
+      .epilogue-verse { font-size: 1rem; line-height: 1.8; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="book"></div>
+
+<!-- nav arrows: ימין=חזרה, שמאל=קדימה (RTL) -->
+<div class="nav-arrows" id="nav-arrows" style="display:none;">
+  <button class="nav-btn" id="btn-prev" aria-label="הקודם">&#8594;</button>
+  <button class="nav-btn pulse" id="btn-next" aria-label="הבא">&#8592;</button>
+</div>
+
+<div class="dots-bar hidden" id="dots-bar"></div>
+
+<button class="btn-mute" id="btn-mute" aria-label="השתק">🔊</button>
+
+<script>
+  // ========== DATA ==========
+  const PAGES = [
+    { type: 'cover', img: 'images/00_cover.jpg', audio: 'audio/cover.mp3' },
+    { type: 'story', img: 'images/01_page_1.jpg', audio: 'audio/page_01.mp3',
+      text: 'פעם נסיכה, לא ככל הנסיכות,<br>אהבה לטייל בין ביצות מלוכלכות.<br>במקום לחלום על נשפים וכתרים,<br>היא העדיפה צבים ושיחים ירוקים.',
+      tap: 'princess' },
+    { type: 'story', img: 'images/02_page_2.jpg', audio: 'audio/page_02.mp3',
+      text: 'יום אחד, בין עשבים ופרחים,<br>ראתה צב ביצות עם מבט נעים.<br>"איזה חמוד!" היא אמרה בשמחה,<br>"אולי אתחתן איתו? כן, אני בטוחה!"',
+      tap: 'princess' },
+    { type: 'story', img: 'images/03_page_3.jpg', audio: 'audio/page_03.mp3',
+      text: 'פנתה הנסיכה לצב עם חיוך רחב,<br>"רוצה להתחתן? תמיד אותך אוהב!"<br>אך הצב רק שתק, לא הזיז שום דבר,<br>כי צבים מדברים? זה לא דבר מוכר.',
+      tap: 'turtle-wobble' },
+    { type: 'story', img: 'images/04_page_4.jpg', audio: 'audio/page_04.mp3',
+      text: 'מן השביל צעד רון, נסיך צעיר,<br>ילד חכם ואמיץ, עם עתיד מזהיר.<br>"נסיכה, עצרי, זה רעיון קצת מוזר,<br>צב יישאר צב, גם אם תנסי שוב מחר."<br>"למה לעצור?" שאלה, עיניה בורקות,<br>"אולי קסם יקרה, בחיים יש הפתעות!"',
+      tap: 'princess' },
+    { type: 'story', img: 'images/05_page_5.jpg', audio: 'audio/page_05.mp3',
+      text: 'ביום השני, לביצה היא דילגה,<br>בידה החזיקה פרח והביטה בערגה.<br>אך הצב לא זז, לא התרשם מהעלילה,<br>ישב בשקט, בצורה הרגילה.',
+      tap: 'turtle-silence' },
+    { type: 'story', img: 'images/06_page_6.jpg', audio: 'audio/page_06.mp3',
+      text: 'ביום השלישי היא באה לשיר,<br>"צב קטן, תתחתן איתי, זה יהיה נפלא ונדיר!"<br>אך הצב לא זז, לא הרים עיניים,<br>ישב בשקט, שקוע במים.',
+      tap: 'turtle-silence' },
+    { type: 'story', img: 'images/07_page_7.jpg', audio: 'audio/page_07.mp3',
+      text: 'ביום הרביעי חזרה בבוקר מוקדם,<br>בידה עוגיות שזה עתה נאפו בתנור חם.<br>"צב יקר, תאכל לבריאות,<br>אולי אז תסכים להתחתן איתי במהירות!"<br>אך הצב לא התרשם, לא טעם אפילו ביס,<br>ישב שם בשקט, לא הזיז אפילו ריס.',
+      tap: 'turtle-silence' },
+    { type: 'story', img: 'images/08_page_8.jpg', audio: 'audio/page_08.mp3',
+      text: 'ביום החמישי היא באה עם סיפור,<br>"צב קטן, תקשיב," היא אמרה תוך כדי אלתור.<br>היא סיפרה על צב חתיך שמתחתן עם נסיכה טובה,<br>תיארה לו בפרטים את סיפור האהבה.<br>אך הצב לא זז, לא התרשם מהעלילה,<br>ישב בשקט בצורה הרגילה.',
+      tap: 'turtle-silence' },
+    { type: 'story', img: 'images/09_page_9.jpg', audio: 'audio/page_09.mp3',
+      text: 'ביום השישי, היא הביאה צעצועים,<br>"צב קטן, בוא נשחק, נבנה בניינים!"<br>היא שפכה ערמות של בוץ ליד המים,<br>"בוא נבנה טירה, נוכל לגור בה בשניים!"<br>אך הצב לא זז, לא הצטרף לשעשועים,<br>ישב בשקט, ולא נגע בצעצועים.',
+      tap: 'turtle-silence' },
+    { type: 'story', img: 'images/10_page_10.jpg', audio: 'audio/page_10.mp3',
+      text: 'ביום השביעי נמאס לה להמתין,<br>"אני אנסה נשיקה, זה יוביל לאירוסין!"<br>היא התכופפה לנשק את הצב,<br>פתאום חשה קסם — משהו קורה עכשיו!',
+      tap: 'princess-magic' },
+    { type: 'story', img: 'images/11_page_11.jpg', audio: 'audio/page_11.mp3',
+      text: 'פתאום הרגישה שרגליה מתקצרות,<br>על גבה צומח שריון, ידיה מתכווצות.<br>"אוי לא!" היא צעקה, "מה עשיתי?<br>אני צב ביצות, לא את זה רציתי!"',
+      tap: 'twist' },
+    { type: 'epilogue', img: 'images/12_page_12.jpg', audio: 'audio/page_12.mp3',
+      verse: 'ומאז בביצה שוחים שני צבים,<br>אחת חדשה ואחד שאנחנו מכירים.<br>הנסיך רון חזר לארמונו בעצבותו,<br>כי למרות שצדק, הוא איבד את חברתו.<br>אהבה היא לא התלהבות ממשהו שאי אפשר להשיג,<br>צריך תקשורת טובה, אם אי אפשר לשוחח זה מדאיג.<br>זו בעיה גדולה שצבים לא מדברים,<br>אולי הגיע הזמן ללמוד מזה דברים!',
+      moral: 'אך המסקנה הגדולה ביותר לידיעת הנסיכות:<br><strong>אסור לנשק צב ביצות!</strong>',
+      tap: 'turtles' }
+  ];
+
+  // ========== STATE ==========
+  const TOTAL = PAGES.length; // 13
+  let currentPage = 0;
+  let muted = false;
+  try { muted = localStorage.getItem('muted') === '1'; } catch (e) {}
+  let hasInteracted = false;
+  let firstSwipeDone = false;
+  let wakeLock = null;
+  let audioCtx = null;
+
+  const audioElements = [];
+  const pageElements = [];
+
+  // ========== BUILD PAGES ==========
+  function buildPages() {
+    const book = document.getElementById('book');
+    const dotsBar = document.getElementById('dots-bar');
+
+    PAGES.forEach((p, i) => {
+      const page = document.createElement('div');
+      page.className = 'page';
+      page.dataset.idx = i;
+
+      if (p.type === 'cover') {
+        page.classList.add('cover-page');
+        page.innerHTML = `
+          <div class="image-container"><img src="${p.img}" alt=""></div>
+          <div class="cover-bottom">
+            <div class="cover-title">הנסיכה וצב הביצות</div>
+            <div class="cover-author">מאת עמר דביר</div>
+            <button class="btn-start" id="btn-start">התחילו לקרוא ◀</button>
+          </div>
+        `;
+      } else if (p.type === 'story') {
+        page.innerHTML = `
+          <div class="image-container">
+            <img src="${p.img}" alt="">
+            <div class="audio-progress"><div class="audio-progress-fill"></div></div>
+          </div>
+          <div class="text-container">
+            <div class="text-content">${p.text}</div>
+          </div>
+        `;
+        page.classList.add('story-page');
+      } else if (p.type === 'epilogue') {
+        page.classList.add('epilogue-page');
+        page.innerHTML = `
+          <div class="image-container">
+            <img src="${p.img}" alt="">
+            <div class="audio-progress"><div class="audio-progress-fill"></div></div>
+          </div>
+          <div class="epilogue-content">
+            <div class="epilogue-verse">${p.verse}</div>
+            <div class="epilogue-moral">${p.moral}</div>
+            <button class="btn-restart" id="btn-restart">🔄 מההתחלה</button>
+          </div>
+        `;
+      }
+
+      // Audio button on every non-cover page
+      if (p.type !== 'cover') {
+        const btn = document.createElement('button');
+        btn.className = 'btn-audio';
+        btn.innerHTML = '🔊';
+        btn.setAttribute('aria-label', 'הקרא לי');
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          toggleAudio(i);
+        });
+        page.querySelector('.image-container').appendChild(btn);
+      }
+
+      // Audio element
+      const audio = document.createElement('audio');
+      audio.preload = 'auto';
+      audio.src = p.audio;
+      page.appendChild(audio);
+      audioElements[i] = audio;
+
+      audio.addEventListener('ended', () => {
+        const btn = page.querySelector('.btn-audio');
+        if (btn) { btn.innerHTML = '🔊'; btn.classList.remove('playing'); }
+      });
+      audio.addEventListener('timeupdate', () => {
+        if (audio.duration > 0) {
+          const fill = page.querySelector('.audio-progress-fill');
+          if (fill) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+        }
+      });
+
+      // Tap zone for character interactions on image
+      if (p.tap) {
+        const imgContainer = page.querySelector('.image-container');
+        imgContainer.addEventListener('click', e => {
+          if (e.target.closest('.btn-audio')) return;
+          handleTap(p.tap, e, page);
+        });
+      }
+
+      book.appendChild(page);
+      pageElements[i] = page;
+
+      // Dots: skip cover (index 0)
+      if (i > 0) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.dataset.idx = i;
+        dotsBar.appendChild(dot);
+      }
+    });
+
+    // Activate cover
+    pageElements[0].classList.add('active');
+
+    // Wire start button
+    document.getElementById('btn-start').addEventListener('click', startBook);
+
+    // Wire restart button
+    const restart = document.getElementById('btn-restart');
+    if (restart) restart.addEventListener('click', () => {
+      try { localStorage.removeItem('lastPage'); } catch (e) {}
+      goToPage(0);
+    });
+  }
+
+  // ========== START FROM COVER ==========
+  async function startBook() {
+    hasInteracted = true;
+    // Initialize audio context (needed for SFX, tied to user gesture)
+    getCtx();
+    // Fullscreen
+    try {
+      const el = document.documentElement;
+      if (el.requestFullscreen) await el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
+    } catch (e) {}
+    // Wake Lock
+    await acquireWakeLock();
+    // Resume from last page if available, else start at page 1
+    let resumePage = 1;
+    try {
+      const saved = parseInt(localStorage.getItem('lastPage') || '0', 10);
+      if (saved >= 1 && saved < TOTAL) resumePage = saved;
+    } catch (e) {}
+    goToPage(resumePage);
+  }
+
+  async function acquireWakeLock() {
+    try {
+      if ('wakeLock' in navigator) {
+        wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener && wakeLock.addEventListener('release', () => { wakeLock = null; });
+      }
+    } catch (e) {}
+  }
+
+  // ========== NAVIGATION ==========
+  function goToPage(n) {
+    if (n < 0 || n >= TOTAL) return;
+    if (n === currentPage) return;
+
+    const oldPage = pageElements[currentPage];
+    const newPage = pageElements[n];
+
+    // Stop all audio
+    stopAllAudio();
+
+    if (oldPage) oldPage.classList.remove('active');
+    newPage.classList.add('active');
+    currentPage = n;
+
+    try { localStorage.setItem('lastPage', String(n)); } catch (e) {}
+
+    // Auto-play audio (skip cover; require user interaction)
+    if (n > 0 && hasInteracted && !muted) {
+      setTimeout(() => playAudio(n), 250);
+    }
+
+    updateUI();
+  }
+
+  function nextPage() { firstSwipeDone = true; goToPage(currentPage + 1); }
+  function prevPage() { firstSwipeDone = true; goToPage(currentPage - 1); }
+
+  function updateUI() {
+    const prev = document.getElementById('btn-prev');
+    const next = document.getElementById('btn-next');
+    const dotsBar = document.getElementById('dots-bar');
+    const navArrows = document.getElementById('nav-arrows');
+
+    if (currentPage === 0) {
+      navArrows.style.display = 'none';
+      dotsBar.classList.add('hidden');
+    } else {
+      navArrows.style.display = 'flex';
+      dotsBar.classList.remove('hidden');
+      prev.classList.toggle('hidden', currentPage <= 1);
+      next.classList.toggle('hidden', currentPage >= TOTAL - 1);
+      if (firstSwipeDone) next.classList.remove('pulse');
+    }
+
+    document.querySelectorAll('.dot').forEach(d => {
+      d.classList.toggle('active', Number(d.dataset.idx) === currentPage);
+    });
+  }
+
+  // ========== AUDIO ==========
+  function playAudio(i) {
+    if (muted) return;
+    const audio = audioElements[i];
+    if (!audio) return;
+
+    stopAllAudio();
+    try {
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        const btn = pageElements[i].querySelector('.btn-audio');
+        if (btn) { btn.innerHTML = '⏸'; btn.classList.add('playing'); }
+      }).catch(() => {});
+    } catch (e) {}
+  }
+
+  function stopAllAudio() {
+    audioElements.forEach((a, idx) => {
+      if (a && !a.paused) {
+        a.pause();
+        a.currentTime = 0;
+      }
+      const page = pageElements[idx];
+      if (page) {
+        const btn = page.querySelector('.btn-audio');
+        if (btn) { btn.innerHTML = '🔊'; btn.classList.remove('playing'); }
+        const fill = page.querySelector('.audio-progress-fill');
+        if (fill) fill.style.width = '0%';
+      }
+    });
+  }
+
+  function toggleAudio(i) {
+    hasInteracted = true;
+    const audio = audioElements[i];
+    if (!audio) return;
+    if (audio.paused) playAudio(i);
+    else {
+      audio.pause();
+      audio.currentTime = 0;
+      const btn = pageElements[i].querySelector('.btn-audio');
+      if (btn) { btn.innerHTML = '🔊'; btn.classList.remove('playing'); }
+      const fill = pageElements[i].querySelector('.audio-progress-fill');
+      if (fill) fill.style.width = '0%';
+    }
+  }
+
+  // ========== MUTE ==========
+  function toggleMute() {
+    muted = !muted;
+    try { localStorage.setItem('muted', muted ? '1' : '0'); } catch (e) {}
+    const muteBtn = document.getElementById('btn-mute');
+    muteBtn.innerHTML = muted ? '🔇' : '🔊';
+    if (muted) {
+      stopAllAudio();
+    } else if (currentPage > 0 && hasInteracted) {
+      playAudio(currentPage);
+    }
+  }
+
+  // ========== SWIPE ==========
+  let touchStartX = 0, touchStartY = 0, touchActive = false;
+  document.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchActive = true;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    if (!touchActive) return;
+    touchActive = false;
+    const dx = touchStartX - e.changedTouches[0].clientX;
+    const dy = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      hasInteracted = true;
+      if (dx > 0) nextPage();
+      else prevPage();
+    }
+  }, { passive: true });
+
+  // ========== KEYBOARD (desktop) ==========
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') nextPage();
+    else if (e.key === 'ArrowRight') prevPage();
+  });
+
+  // ========== SFX (Web Audio API) ==========
+  function getCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+  function playSFX(type) {
+    if (muted) return;
+    let ctx;
+    try { ctx = getCtx(); } catch (e) { return; }
+    const now = ctx.currentTime;
+    if (type === 'sparkle') {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(880, now);
+      o.frequency.exponentialRampToValueAtTime(1760, now + 0.25);
+      g.gain.setValueAtTime(0.16, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      o.start(now); o.stop(now + 0.45);
+    } else if (type === 'turtle') {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(180, now);
+      o.frequency.linearRampToValueAtTime(140, now + 0.18);
+      g.gain.setValueAtTime(0.14, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      o.start(now); o.stop(now + 0.45);
+    } else if (type === 'magic') {
+      [523, 659, 784, 1047].forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0, now + i * 0.09);
+        g.gain.linearRampToValueAtTime(0.13, now + i * 0.09 + 0.05);
+        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.09 + 0.32);
+        o.start(now + i * 0.09); o.stop(now + i * 0.09 + 0.36);
+      });
+    } else if (type === 'silence') {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = 220;
+      g.gain.setValueAtTime(0.05, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      o.start(now); o.stop(now + 0.2);
+    }
+  }
+
+  // ========== SPARKLES ==========
+  const SPARKLE_GLYPHS = { default: '✨', pink: '💖', magic: '⭐' };
+  function spawnSparkles(x, y, count, kind) {
+    const glyph = SPARKLE_GLYPHS[kind] || SPARKLE_GLYPHS.default;
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.textContent = glyph;
+      s.style.setProperty('--dx', ((Math.random() - 0.5) * 90) + 'px');
+      s.style.left = (x - 11 + (Math.random() - 0.5) * 30) + 'px';
+      s.style.top = (y - 11) + 'px';
+      s.style.animationDelay = (i * 0.07) + 's';
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 1800);
+    }
+  }
+
+  // ========== TAP HANDLER ==========
+  function handleTap(kind, e, page) {
+    hasInteracted = true;
+    const x = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || window.innerWidth / 2;
+    const y = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY) || window.innerHeight / 3;
+
+    if (kind === 'princess') {
+      spawnSparkles(x, y, 5);
+      playSFX('sparkle');
+    } else if (kind === 'turtle-wobble' || kind === 'turtles') {
+      const img = page.querySelector('.image-container img');
+      if (img) {
+        img.classList.remove('wobble');
+        void img.offsetWidth;
+        img.classList.add('wobble');
+        setTimeout(() => img.classList.remove('wobble'), 700);
+      }
+      playSFX('turtle');
+    } else if (kind === 'turtle-silence') {
+      const old = page.querySelector('.silence-bubble');
+      if (old) old.remove();
+      const bubble = document.createElement('div');
+      bubble.className = 'silence-bubble';
+      bubble.textContent = '...';
+      page.querySelector('.image-container').appendChild(bubble);
+      setTimeout(() => bubble.remove(), 1900);
+      playSFX('silence');
+    } else if (kind === 'princess-magic') {
+      spawnSparkles(x, y, 7, 'pink');
+      playSFX('magic');
+    } else if (kind === 'twist') {
+      spawnSparkles(x, y, 7, 'magic');
+      playSFX('magic');
+    }
+  }
+
+  // ========== COVER TAP (play title audio) ==========
+  function setupCoverTap() {
+    const coverImg = pageElements[0].querySelector('.image-container');
+    coverImg.addEventListener('click', () => {
+      hasInteracted = true;
+      getCtx();
+      playAudio(0);
+    });
+  }
+
+  // ========== LOCK DOWN ==========
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('gesturestart', e => e.preventDefault());
+  document.addEventListener('dblclick', e => e.preventDefault());
+
+  // Re-acquire wake lock when tab returns to view
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && wakeLock === null && hasInteracted) {
+      await acquireWakeLock();
+    }
+  });
+
+  // ========== INIT ==========
+  buildPages();
+  setupCoverTap();
+
+  document.getElementById('btn-mute').innerHTML = muted ? '🔇' : '🔊';
+  document.getElementById('btn-mute').addEventListener('click', toggleMute);
+  document.getElementById('btn-prev').addEventListener('click', prevPage);
+  document.getElementById('btn-next').addEventListener('click', nextPage);
+
+  updateUI();
+
+  // Optional: register service worker (PWA)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+</script>
+
+</body>
+</html>

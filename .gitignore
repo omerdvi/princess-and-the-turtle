@@ -1,0 +1,18 @@
+# Android build outputs / local config
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/*.iml
+android/captures/
+
+# Source archives (large originals; book is built from princess_turtle_book/)
+Pictures/
+Recordings/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
