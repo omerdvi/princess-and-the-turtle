@@ -44,6 +44,31 @@
       to   { opacity: 1; }
     }
 
+    /* ===== RESPONSIVE TOKENS =====
+       Sizes scale with the viewport using clamp() so a single ruleset
+       fits phones, tablets, and desktop. min/max caps prevent runaway
+       scaling on tiny or huge screens. vmin = the smaller viewport edge,
+       which behaves well in both portrait and landscape. */
+    :root {
+      --text-story:    clamp(1.15rem, 3.6vmin, 1.6rem);
+      --line-story:    2.05;
+      --text-verse:    clamp(0.95rem, 2.6vmin, 1.2rem);
+      --text-moral:    clamp(0.95rem, 2.6vmin, 1.2rem);
+      --text-moral-em: clamp(1.15rem, 3.2vmin, 1.5rem);
+      --text-title:    clamp(1.4rem, 5vmin, 2.2rem);
+
+      --nav-size:    clamp(56px, 11vmin, 84px);
+      --nav-icon:    clamp(1.6rem, 4.5vmin, 2.6rem);
+      --audio-size:  clamp(48px, 9vmin, 68px);
+      --audio-icon:  clamp(1.3rem, 3.5vmin, 1.8rem);
+      --mute-size:   clamp(40px, 7vmin, 52px);
+      --mute-icon:   clamp(1rem, 2.6vmin, 1.3rem);
+      --dot-size:    clamp(7px, 1.4vmin, 10px);
+
+      --pad-edge:    clamp(10px, 2.4vmin, 22px);
+      --gap-content: clamp(10px, 2vmin, 18px);
+    }
+
     /* ===== COVER ===== */
     .cover-page {
       flex-direction: column;
@@ -51,9 +76,10 @@
       align-items: center;
     }
     .cover-page .image-container {
-      flex: 0 0 70%;
+      flex: 0 0 65%;
       width: 100%;
       cursor: pointer;
+      min-height: 0;
     }
     .cover-page .image-container img {
       width: 100%; height: 100%; object-fit: contain;
@@ -62,19 +88,25 @@
       flex: 1;
       display: flex; flex-direction: column;
       justify-content: center; align-items: center;
-      gap: 14px; padding: 16px;
+      gap: var(--gap-content);
+      padding: var(--pad-edge);
+      min-height: 0;
     }
     .cover-title {
-      font-size: 1.9rem; font-weight: 700; color: #FDF6E3;
+      font-size: var(--text-title); font-weight: 700; color: #FDF6E3;
       text-shadow: 0 2px 8px rgba(0,0,0,0.4);
       line-height: 1.3; text-align: center;
     }
-    .cover-author { font-size: 1rem; color: #FDF6E3; opacity: 0.85; }
+    .cover-author {
+      font-size: clamp(0.85rem, 2vmin, 1.05rem);
+      color: #FDF6E3; opacity: 0.85;
+    }
     .btn-start {
       background: #F5A623; color: #fff;
       border: none; border-radius: 50px;
-      padding: 18px 56px;
-      font-size: 1.5rem; font-family: inherit; font-weight: 700;
+      padding: clamp(12px, 2.4vmin, 20px) clamp(32px, 7vmin, 60px);
+      font-size: clamp(1.1rem, 3vmin, 1.55rem);
+      font-family: inherit; font-weight: 700;
       cursor: pointer;
       box-shadow: 0 4px 16px rgba(0,0,0,0.35);
       animation: pulseBtn 2.5s ease-in-out infinite;
@@ -88,10 +120,11 @@
     /* ===== STORY PAGE ===== */
     .story-page { flex-direction: column; }
     .story-page .image-container {
-      flex: 0 0 58%;
+      flex: 0 0 56%;
       position: relative;
       overflow: hidden;
       cursor: pointer;
+      min-height: 0;
     }
     .story-page .image-container img {
       width: 100%; height: 100%;
@@ -102,26 +135,30 @@
     .story-page .text-container {
       flex: 1;
       background: #FDF6E3;
-      padding: 18px 22px;
+      padding: var(--pad-edge) calc(var(--pad-edge) * 1.2);
+      /* leave room for nav arrows + dots row */
+      padding-bottom: calc(var(--nav-size) + var(--dot-size) * 2 + 28px);
       display: flex; align-items: center; justify-content: center;
       overflow-y: auto;
       touch-action: pan-y;
+      min-height: 0;
     }
     .story-page .text-content {
       text-align: right;
-      line-height: 2.4;
-      font-size: 1.55rem; font-weight: 600;
-      max-width: 640px; width: 100%;
+      line-height: var(--line-story);
+      font-size: var(--text-story); font-weight: 600;
+      max-width: 720px; width: 100%;
       letter-spacing: 0.01em;
     }
 
     /* ===== EPILOGUE ===== */
     .epilogue-page { flex-direction: column; }
     .epilogue-page .image-container {
-      flex: 0 0 42%;
+      flex: 0 0 38%;
       position: relative;
       overflow: hidden;
       cursor: pointer;
+      min-height: 0;
     }
     .epilogue-page .image-container img {
       width: 100%; height: 100%;
@@ -133,35 +170,39 @@
       flex: 1;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 16px;
-      padding: 20px 24px;
+      gap: var(--gap-content);
+      padding: var(--pad-edge) calc(var(--pad-edge) * 1.2);
+      padding-bottom: calc(var(--nav-size) + 24px);
       text-align: center;
       overflow-y: auto;
       touch-action: pan-y;
+      min-height: 0;
     }
     .epilogue-verse {
       background: #FDF6E3;
       border-radius: 16px;
-      padding: 18px 22px;
-      font-size: 1.2rem; line-height: 2;
+      padding: clamp(12px, 2.4vmin, 20px) clamp(14px, 2.8vmin, 24px);
+      font-size: var(--text-verse); line-height: 1.95;
       color: #3D2B1F; font-weight: 500;
       box-shadow: 0 4px 18px rgba(0,0,0,0.3);
-      max-width: 560px;
+      max-width: 640px;
     }
     .epilogue-moral {
-      font-size: 1.2rem; line-height: 1.8;
+      font-size: var(--text-moral); line-height: 1.8;
       color: #FDF6E3; font-weight: 600;
+      max-width: 640px;
     }
     .epilogue-moral strong {
       display: block;
-      font-size: 1.5rem; color: #F5A623;
+      font-size: var(--text-moral-em); color: #F5A623;
       margin-top: 6px;
     }
     .btn-restart {
       background: #F5A623; color: #fff;
       border: none; border-radius: 50px;
-      padding: 14px 38px;
-      font-size: 1.1rem; font-family: inherit; font-weight: 700;
+      padding: clamp(10px, 2vmin, 16px) clamp(24px, 5vmin, 42px);
+      font-size: clamp(0.95rem, 2.4vmin, 1.15rem);
+      font-family: inherit; font-weight: 700;
       cursor: pointer;
       box-shadow: 0 4px 14px rgba(0,0,0,0.3);
       display: inline-flex; align-items: center; gap: 8px;
@@ -171,17 +212,18 @@
     /* ===== NAV ARROWS ===== */
     .nav-arrows {
       position: fixed;
-      bottom: 16px; left: 0; right: 0;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      left: 0; right: 0;
       display: flex; justify-content: space-between;
-      padding: 0 16px;
+      padding: 0 clamp(8px, 2vmin, 20px);
       pointer-events: none;
       z-index: 100;
     }
     .nav-btn {
-      width: 80px; height: 80px;
+      width: var(--nav-size); height: var(--nav-size);
       border-radius: 50%; border: none;
       background: rgba(245,166,35,0.85);
-      color: #fff; font-size: 2.4rem;
+      color: #fff; font-size: var(--nav-icon);
       cursor: pointer; pointer-events: auto;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 4px 14px rgba(0,0,0,0.35);
@@ -199,15 +241,16 @@
     /* ===== DOTS ===== */
     .dots-bar {
       position: fixed;
-      bottom: 110px; left: 50%;
+      bottom: calc(var(--nav-size) + max(12px, env(safe-area-inset-bottom)) + 14px);
+      left: 50%;
       transform: translateX(-50%);
-      display: flex; gap: 6px;
+      display: flex; gap: clamp(5px, 1vmin, 8px);
       z-index: 99;
       pointer-events: none;
     }
     .dots-bar.hidden { display: none; }
     .dot {
-      width: 8px; height: 8px;
+      width: var(--dot-size); height: var(--dot-size);
       border-radius: 50%;
       background: rgba(253,246,227,0.65);
       transition: background 0.3s ease, transform 0.3s ease;
@@ -222,11 +265,12 @@
     /* ===== AUDIO BUTTON ===== */
     .btn-audio {
       position: absolute;
-      top: 14px; left: 14px;
-      width: 64px; height: 64px;
+      top: clamp(10px, 2vmin, 18px);
+      left: clamp(10px, 2vmin, 18px);
+      width: var(--audio-size); height: var(--audio-size);
       border-radius: 50%; border: none;
       background: rgba(245,166,35,0.92);
-      color: #fff; font-size: 1.7rem;
+      color: #fff; font-size: var(--audio-icon);
       cursor: pointer;
       z-index: 20;
       display: flex; align-items: center; justify-content: center;
@@ -240,11 +284,12 @@
     /* ===== MUTE BUTTON (global) ===== */
     .btn-mute {
       position: fixed;
-      top: 14px; right: 14px;
-      width: 48px; height: 48px;
+      top: max(10px, env(safe-area-inset-top));
+      right: clamp(10px, 2vmin, 18px);
+      width: var(--mute-size); height: var(--mute-size);
       border-radius: 50%; border: none;
       background: rgba(0,0,0,0.4);
-      color: #FDF6E3; font-size: 1.2rem;
+      color: #FDF6E3; font-size: var(--mute-icon);
       cursor: pointer;
       z-index: 200;
       display: flex; align-items: center; justify-content: center;
@@ -320,34 +365,73 @@
       75%      { transform: rotate(5deg) scale(1.02); }
     }
 
-    /* ===== LANDSCAPE ===== */
+    /* ===== LANDSCAPE — image and text side by side ===== */
     @media (orientation: landscape) {
       .story-page { flex-direction: row-reverse; }
       .story-page .image-container { flex: 0 0 55%; height: 100%; }
-      .story-page .text-container { flex: 0 0 45%; padding: 16px 24px; }
-      .story-page .text-content { font-size: 1.3rem; line-height: 2.1; }
+      .story-page .text-container {
+        flex: 0 0 45%;
+        padding: var(--pad-edge) calc(var(--pad-edge) * 1.4);
+        padding-bottom: var(--pad-edge);
+      }
 
       .cover-page { flex-direction: row-reverse; }
-      .cover-page .image-container { flex: 0 0 60%; height: 100%; }
-      .cover-bottom { flex: 0 0 40%; }
+      .cover-page .image-container { flex: 0 0 58%; height: 100%; }
+      .cover-bottom { flex: 0 0 42%; }
 
       .epilogue-page { flex-direction: row-reverse; }
-      .epilogue-page .image-container { flex: 0 0 50%; height: 100%; }
-      .epilogue-content { flex: 0 0 50%; padding: 18px 22px; gap: 12px; }
-      .epilogue-verse { font-size: 1.05rem; padding: 14px 18px; line-height: 1.9; }
-      .epilogue-moral { font-size: 1.05rem; }
-      .epilogue-moral strong { font-size: 1.3rem; }
+      .epilogue-page .image-container { flex: 0 0 48%; height: 100%; }
+      .epilogue-content {
+        flex: 0 0 52%;
+        padding: var(--pad-edge) calc(var(--pad-edge) * 1.4);
+        padding-bottom: var(--pad-edge);
+      }
 
-      .nav-btn { width: 68px; height: 68px; font-size: 2rem; }
-      .dots-bar { bottom: 96px; }
+      /* nav arrows are the only fixed UI overlapping the side panel —
+         leave a thin reserved strip at the bottom so they don't sit on text */
+      .story-page .text-container,
+      .epilogue-content {
+        padding-bottom: calc(var(--nav-size) * 0.6);
+      }
+
+      /* dots back to overlap the bottom of the image, not floating over text */
+      .dots-bar {
+        bottom: max(12px, env(safe-area-inset-bottom));
+        left: 28%; transform: translateX(-50%);
+      }
+      /* nav arrows hug the corners less aggressively in landscape */
+      .nav-arrows { padding: 0 clamp(12px, 2.4vmin, 24px); }
     }
 
-    /* ===== SMALL SCREENS ===== */
+    /* ===== PHONE LANDSCAPE — very short height ===== */
+    @media (orientation: landscape) and (max-height: 480px) {
+      .story-page .image-container { flex: 0 0 50%; }
+      .story-page .text-container,
+      .epilogue-content { padding-bottom: 6px; }
+      .dots-bar { display: none; }
+      .btn-audio { top: 8px; left: 8px; }
+      .btn-mute  { top: 8px; right: 8px; }
+    }
+
+    /* ===== PHONE PORTRAIT — narrow width ===== */
+    @media (orientation: portrait) and (max-width: 480px) {
+      .story-page .image-container { flex: 0 0 50%; }
+      .epilogue-page .image-container { flex: 0 0 36%; }
+      .cover-page .image-container { flex: 0 0 60%; }
+    }
+
+    /* ===== DESKTOP / WIDE — keep things from blowing up ===== */
+    @media (min-width: 1100px) and (orientation: landscape) {
+      .story-page .image-container { flex: 0 0 58%; }
+      .story-page .text-container  { flex: 0 0 42%; }
+      .story-page .text-content    { max-width: 560px; }
+      .epilogue-content            { max-width: 100%; }
+    }
+
+    /* ===== SHORT PORTRAIT (e.g. small landscape-rotated frames) ===== */
     @media (max-height: 600px) and (orientation: portrait) {
-      .story-page .image-container { flex: 0 0 52%; }
-      .story-page .text-content { font-size: 1.25rem; line-height: 2; }
-      .epilogue-page .image-container { flex: 0 0 42%; }
-      .epilogue-verse { font-size: 1rem; line-height: 1.8; }
+      .story-page .image-container { flex: 0 0 48%; }
+      .epilogue-page .image-container { flex: 0 0 36%; }
     }
   </style>
 </head>
